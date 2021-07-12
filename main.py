@@ -1,9 +1,10 @@
-import random
+from random import random
+from random import randrange
 import math
 from bresenham import bresenham
 import pyxel
-import webbrowser
-import urllib.parse
+from webbrowser import open as openw
+from urllib.parse import quote_plus
 SCENE_TITLE = 0
 SCENE_TITLE_TO_GAME = 1
 SCENE_GAME = 2
@@ -21,7 +22,7 @@ class Background:
         self.dot_color = 4
         for i in range(BACK_DOT_COUNT):
             self.dot_list.append(
-                (random.random() * pyxel.width, random.random() * pyxel.height,1)
+                (random() * pyxel.width, random() * pyxel.height,1)
             )
 
     def draw(self):
@@ -67,8 +68,8 @@ class Blood:
         self.p = p
         self.parent = p.parent
         self.alive = True
-        self.posx = p.posx+random.randrange(-5, 5)
-        self.posy = p.posy+random.randrange(-5, 5)
+        self.posx = p.posx+randrange(-5, 5)
+        self.posy = p.posy+randrange(-5, 5)
     def update(self):
         if self.posy > pyxel.height+self.parent.scroll_y+11:
             self.alive = False
@@ -78,7 +79,7 @@ class Enemy:
     def __init__(self,parent):
         self.parent = parent
         self.anime_count = 0
-        self.posx = random.random()*(pyxel.width-64-10)+32+5
+        self.posx = random()*(pyxel.width-64-10)+32+5
         self.posy = -self.parent.scroll_y+0
         self.alive = True
     def update(self):
@@ -101,7 +102,7 @@ class Enemy:
         pyxel.blt(self.posx-5,self.posy-11+self.parent.scroll_y,0,tilex,0,16,11,14)
     def killed(self):
         self.parent.killcount += 1
-        if random.random()>0.7:
+        if random()>0.7:
             drops_list.append(Drop(self))
         self.alive = False
         for i in range(20):
@@ -322,8 +323,8 @@ class App:
                             pyxel.pal(12, 8)
                             pyxel.pal(7,12)
                             if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
-                                webbrowser.open(
-                                    "https://twitter.com/intent/tweet?text=" + urllib.parse.quote_plus("SCORE:".upper()+str(self.stop_count - self.start_count)+"\nKILL:".upper()+str(self.killcount)+"\n#Bakumatu_Harisenbon\nhttps://github.com/AlageZ/Harisenbon/releases/"))
+                                openw(
+                                    "https://twitter.com/intent/tweet?text=" + quote_plus("SCORE:".upper()+str(self.stop_count - self.start_count)+"\nKILL:".upper()+str(self.killcount)+"\n#Bakumatu_Harisenbon\nhttps://github.com/AlageZ/Harisenbon/releases/"))
                         pyxel.blt(37,47,0,32,64,64,64,0)
                         pyxel.pal()
                         pyxel.mouse(True)
