@@ -172,7 +172,7 @@ class Player:
                 if math.floor(i.posy) == math.floor(self.posy):
                     if i.p != self:
                         self.bloodflag = 10
-        if pyxel.frame_count%5==0 and self.bloodflag > 0:
+        if pyxel.frame_count % 5 == 0 and self.bloodflag > 0:
             self.bloodflag-=1
             bloods_list.append(Blood(self))
             bloods_list[-1].posx = self.posx
@@ -200,28 +200,36 @@ class Player:
 class App:
     def __init__(self):
         pyxel.init(184, 192)
+        self.initer()
+        self.counts = {}
+        pyxel.load("assets/main.pyxres")
+        pyxel.run(self.update, self.draw)
+
+    def initer(self):
+
+        global enemys_list, bullets_list, bloods_list, drops_list
+        enemys_list = []
+        bullets_list = []
+        bloods_list = []
+        drops_list = []
         self.killcount = 0
         self.scroll_y = 0
         self.scene = SCENE_TITLE
         self.background = Background(self)
-        self.counts = {}
         self.dif = 1
-        self.kushis = 99
+        self.kushis = 30
         self.clickcount = 0
-        pyxel.load("assets/main.pyxres")
-        pyxel.run(self.update, self.draw)
-
     def update(self):
         if self.scene == SCENE_TITLE:
             self.scroll_y += 1
-            if pyxel.btn(pyxel.MOUSE_LEFT_BUTTON):
+            if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
+                self.start_count = pyxel.frame_count+0
                 pyxel.play(0,3)
                 self.scene = SCENE_TITLE_TO_GAME
                 self.counts["ttg_count_1"] = 0
                 self.counts["ttg_count_2"] = 0
                 self.counts["ttg_count_3"] = 0
                 self.counts["ttg_count_4"] = 0
-                self.start_count = pyxel.frame_count+0
         elif self.scene == SCENE_TITLE_TO_GAME:
             self.scroll_y += 1
             if self.counts["ttg_count_1"]**1.8 > 16:
@@ -243,7 +251,7 @@ class App:
                 self.clickcount = 0
             
             self.scroll_y += self.dif
-            if pyxel.frame_count%(math.floor(20/self.dif)) == 0:
+            if (pyxel.frame_count-self.start_count)%(math.floor(20/self.dif)) == 0:
                 enemys_list.append(Enemy(self))
             for i in enemys_list:
                 if i.alive:
@@ -319,13 +327,20 @@ class App:
                     if self.counts["gtg_count"] > pyxel.height/4+40:
                         pyxel.text(37,40,"KILL  ".upper()+str(self.killcount),0)
                     if self.counts["gtg_count"] > pyxel.height/4+60:
-                        if 37 <= pyxel.mouse_x <= 37+64 and 47 <= pyxel.mouse_y <= 47+64:
+                        if 47 <= pyxel.mouse_x <= 47+32 and 57 <= pyxel.mouse_y <= 57+32:
                             pyxel.pal(12, 8)
                             pyxel.pal(7,12)
                             if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
                                 openw(
                                     "https://twitter.com/intent/tweet?text=" + quote_plus("SCORE:".upper()+str(self.stop_count - self.start_count)+"\nKILL:".upper()+str(self.killcount)+"\n#Bakumatu_Harisenbon\nhttps://github.com/AlageZ/Harisenbon/releases/"))
-                        pyxel.blt(37,47,0,32,64,64,64,0)
+                        pyxel.blt(47,57,0,0,144,32,32,0)
+                        pyxel.pal()
+                        if 47+32+20 <= pyxel.mouse_x <= 47+32+20+32 and 57 <= pyxel.mouse_y <= 57+32:
+                            pyxel.pal(0, 10)
+                            if pyxel.btnp(pyxel.MOUSE_LEFT_BUTTON):
+                                self.counts["gtg_count"] = 0
+                                self.initer()
+                        pyxel.blt(47+32+20,57,0,0,176,32,32,14)
                         pyxel.pal()
                         pyxel.mouse(True)
             self.counts["gtg_count"] += 1
